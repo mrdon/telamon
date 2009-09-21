@@ -74,21 +74,13 @@ public class ScriptManager
         }
     }
 
-    public Component construct(String functionName, Object[] args, Map<String, Object> variables) throws IOException
+    public Component construct(String functionName, Object[] args) throws IOException
     {
         Context cx = Context.enter();
         try
         {
             // Don't bother with a scope per thread since they should not be mutated
             Scriptable threadScope = sharedScope;
-
-            Map<String, Object> vars = new HashMap<String, Object>(variables);
-
-            for (Map.Entry<String, Object> var : vars.entrySet())
-            {
-                Object wrapped = Context.javaToJS(var.getValue(), threadScope);
-                ScriptableObject.putProperty(threadScope, var.getKey(), wrapped);
-            }
 
             Function func = (Function) threadScope.get(functionName, null);
             Object[] wrappedArgs = new Object[args.length];
@@ -105,7 +97,64 @@ public class ScriptManager
         }
     }
 
-    private static Component castResult(Scriptable scope, Object result)
+
+    void ensureCompiled(ScriptSource source) throws IOException
+    {
+        if (!scripts.containsKey(source.getPath()))
+        {
+            Context cx = Context.enter();
+            try
+            {
+                Script script = cx.compileReader(source.getReader(), source.getPath(), 1, null);
+                scripts.put(source.getPath(), script);
+            }
+            finally
+            {
+                Context.exit();
+            }
+        }
+    }
+
+    public void run(ScriptSource scriptSource, Map<String, Object> variables) throws IOException
+    {
+        Context cx = Context.enter();
+        try
+        {
+            // We can share the scope.
+            Scriptable threadScope = cx.newObject(sharedScope);
+            threadScope.setPrototype(sharedScope);
+
+            // We want "threadScope" to be a new top-level
+            // scope, so set its parent scope to null. This
+            // means that any variables created by assignments
+            // will be properties of "threadScope".
+            threadScope.setParentScope(null);
+
+
+            Object result = null;
+            String path = scriptSource.getPath();
+            Reader reader = scriptSource.getReader();
+            System.out.println("really running " + path);
+            ensureCompiled(scriptSource);
+            Script script = scripts.get(path);
+
+            Map<String, Object> vars = new HashMap<String, Object>(variables);
+
+            for (Map.Entry<String, Object> var : vars.entrySet())
+            {
+                Object wrapped = Context.javaToJS(var.getValue(), threadScope);
+                ScriptableObject.putProperty(threadScope, var.getKey(), wrapped);
+            }
+
+            result = script.exec(cx, threadScope);
+        }
+        finally
+        {
+            Context.exit();
+        }
+    }
+
+    public static Component castResult(Scriptable scope, Object result)
     {
         if (result instanceof NativeObject)
         {
@@ -125,6 +174,10 @@ public class ScriptManager
         {
             throw new IllegalArgumentException("Unknown type for result: " + result);
         }
+    }
+
+    public Scriptable getSharedScope() {
+        return sharedScope;
     }
 
     private static class JsComponent implements Component
@@ -179,14 +232,12 @@ public class ScriptManager
             exec("renderEnd", writer, content);
         }
 
-        @Override
         public String[] getChildNames()
         {
             Object result = jsObject.get("childrenNames", null);
             return (String[]) Context.jsToJava(result, String[].class);
         }
 
-        @Override
         public Component get(String id)
         {
             Object result = exec("get", id);

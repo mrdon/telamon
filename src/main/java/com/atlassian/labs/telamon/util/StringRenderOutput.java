@@ -1,4 +1,4 @@
-package com.atlassian.labs.telamon;
+package com.atlassian.labs.telamon.util;
 
 import com.atlassian.labs.telamon.api.RenderOutput;
 

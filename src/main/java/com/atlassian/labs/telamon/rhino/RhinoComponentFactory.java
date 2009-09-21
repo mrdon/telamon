@@ -14,7 +14,11 @@ public class RhinoComponentFactory implements ComponentFactory
 
     public RhinoComponentFactory(File... baseDirs)
     {
-        scriptManager = new ScriptManager();
+        this(new ScriptManager(), baseDirs);
+    }
+    public RhinoComponentFactory(ScriptManager scriptManager, File... baseDirs)
+    {
+        this.scriptManager = scriptManager;
         for (File baseDir : baseDirs)
         {
             for (File jsfile : baseDir.listFiles())
@@ -30,6 +34,6 @@ public class RhinoComponentFactory implements ComponentFactory
 
     public Component create(String type, String id, Map<String, ?> args) throws IOException
     {
-        return scriptManager.construct(type, new Object[] {id, args}, Collections.<String, Object>emptyMap());
+        return scriptManager.construct(type, new Object[] {id, args});
     }
 }

@@ -2,14 +2,12 @@ package com.atlassian.labs.telamon;
 
 import junit.framework.TestCase;
 
-import java.io.File;
 import java.io.IOException;
 import java.io.StringWriter;
 import java.util.Collections;
-import java.util.Map;
-import java.util.HashMap;
 
 import static com.atlassian.labs.telamon.util.FileUtils.file;
+import com.atlassian.labs.telamon.util.StringRenderOutput;
 import com.atlassian.labs.telamon.rhino.RhinoComponentFactory;
 import com.atlassian.labs.telamon.rhino.WriterRenderOutput;
 import com.atlassian.labs.telamon.api.Component;

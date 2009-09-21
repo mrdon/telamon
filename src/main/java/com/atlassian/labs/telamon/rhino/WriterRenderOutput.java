@@ -14,7 +14,6 @@ public class WriterRenderOutput implements RenderOutput
         this.writer = writer;
     }
 
-    @Override
     public RenderOutput write(String output)
     {
         try
