@@ -21,6 +21,10 @@ public class RhinoComponentFactory implements ComponentFactory
         this.scriptManager = scriptManager;
         for (File baseDir : baseDirs)
         {
+            if (baseDir == null || !baseDir.exists())
+            {
+                throw new IllegalArgumentException("The baseDir is null or doesn't exist");
+            }
             for (File jsfile : baseDir.listFiles())
             {
                 if (jsfile.getName().endsWith(".js"))

@@ -18,19 +18,16 @@ public class FileScriptSource implements ScriptSource
         this.file = file;
     }
 
-    @Override
     public long getLastModified()
     {
         return file.lastModified();
     }
 
-    @Override
     public String getPath()
     {
         return file.getPath();
     }
 
-    @Override
     public Reader getReader()
     {
         try

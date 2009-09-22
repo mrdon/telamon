@@ -15,17 +15,14 @@ public class UrlScriptSource implements ScriptSource {
         this.url = url;
     }
 
-    @Override
     public long getLastModified() {
         return 0;
     }
 
-    @Override
     public String getPath() {
         return url.toExternalForm();
     }
 
-    @Override
     public Reader getReader() {
         try {
             return new InputStreamReader(url.openStream());

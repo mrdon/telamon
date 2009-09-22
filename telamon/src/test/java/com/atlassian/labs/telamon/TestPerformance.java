@@ -6,6 +6,7 @@ import com.atlassian.labs.telamon.rhino.WriterRenderOutput;
 import static com.atlassian.labs.telamon.util.FileUtils.file;
 import com.atlassian.labs.telamon.api.Component;
 import com.atlassian.labs.telamon.api.RenderOutput;
+import static com.atlassian.labs.telamon.Helper.buildComponentFactory;
 
 import java.util.Collections;
 import java.util.List;
@@ -13,10 +14,11 @@ import java.util.ArrayList;
 import java.util.Map;
 import java.io.StringWriter;
 import java.io.IOException;
+import java.net.URISyntaxException;
 
 public class TestPerformance extends TestCase
 {
-    public void testSimpleComponent() throws IOException
+    public void testSimpleComponent() throws IOException, URISyntaxException
     {
         long jsTime = buildAndRenderJs(10000);
         long javaTime = buildAndRenderJava(10000);
@@ -25,9 +27,9 @@ public class TestPerformance extends TestCase
     }
 
     private long buildAndRenderJs(int runs)
-            throws IOException
+            throws IOException, URISyntaxException
     {
-        RhinoComponentFactory factory = new RhinoComponentFactory(file("src", "test", "resources", "sampleLibrary"));
+        RhinoComponentFactory factory = buildComponentFactory();
         long start = System.currentTimeMillis();
 
         StringWriter writer = new StringWriter();
@@ -70,7 +72,6 @@ public class TestPerformance extends TestCase
             this.params = params;
         }
 
-        @Override
         public void render(RenderOutput writer, Map<String, ?> attributes)
         {
             StringBuilder sb = new StringBuilder();
