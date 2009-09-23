@@ -39,4 +39,24 @@ public class TestTelamonTag extends TestCase {
         verify(jspWriter).write(argument.capture());
         assertTrue(argument.getValue().contains("id=\"bar\""));
     }
+
+    public void testRenderComponentWithArgs() throws Exception
+    {
+        buildComponentFactory();
+
+        TelamonTag tag = new TelamonTag("TextField") {};
+        PageContext ctx = mock(PageContext.class);
+        JspWriter jspWriter = mock(JspWriter.class);
+        when(ctx.getOut()).thenReturn(jspWriter);
+        tag.setPageContext(ctx);
+        tag.setDynamicAttribute("", "id", "bar");
+        tag.setDynamicAttribute("", "label", "baz");
+        tag.doStartTag();
+        tag.doEndTag();
+
+        ArgumentCaptor<String> argument = ArgumentCaptor.forClass(String.class);
+        verify(jspWriter).write(argument.capture());
+        assertTrue(argument.getValue().contains("id=\"bar\""));
+        assertTrue(argument.getValue().contains("title=\"baz\""));
+    }
 }
