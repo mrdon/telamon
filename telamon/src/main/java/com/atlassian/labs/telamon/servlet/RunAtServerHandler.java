@@ -3,12 +3,11 @@ package com.atlassian.labs.telamon.servlet;
 import org.xml.sax.helpers.DefaultHandler;
 import org.xml.sax.*;
 import com.atlassian.labs.telamon.rhino.ScriptManager;
-import com.atlassian.labs.telamon.rhino.UrlScriptSource;
+import com.atlassian.labs.telamon.util.UrlScriptSource;
 import com.atlassian.labs.telamon.rhino.ScriptSource;
 import com.atlassian.labs.telamon.api.ContainerComponent;
 
 import javax.servlet.ServletContext;
-import java.io.File;
 import java.io.IOException;
 import java.net.MalformedURLException;
 import java.util.Collections;

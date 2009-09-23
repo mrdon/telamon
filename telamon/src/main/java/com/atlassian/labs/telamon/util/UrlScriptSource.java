@@ -1,4 +1,6 @@
-package com.atlassian.labs.telamon.rhino;
+package com.atlassian.labs.telamon.util;
+
+import com.atlassian.labs.telamon.rhino.ScriptSource;
 
 import java.io.Reader;
 import java.io.InputStreamReader;

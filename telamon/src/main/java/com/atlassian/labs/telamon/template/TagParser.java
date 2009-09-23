@@ -9,12 +9,11 @@ import java.util.ArrayList;
 import java.util.Map;
 import java.util.HashMap;
 import java.io.Writer;
-import java.io.IOException;
 
 import com.atlassian.labs.telamon.api.ContainerComponent;
 import com.atlassian.labs.telamon.api.Component;
 import com.atlassian.labs.telamon.api.RenderOutput;
-import com.atlassian.labs.telamon.rhino.WriterRenderOutput;
+import com.atlassian.labs.telamon.util.WriterRenderOutput;
 import com.atlassian.labs.telamon.util.StringRenderOutput;
 
 /**
@@ -41,8 +40,8 @@ public class TagParser extends DefaultHandler
         if (id != null)
         {
             Component comp = currentFrame.component.get(id);
-            comp.render(currentFrame.buffer, readAttributes(attributes));
-            if (comp instanceof ContainerComponent)
+            boolean shouldRenderBody = comp.render(currentFrame.buffer, readAttributes(attributes));
+            if (shouldRenderBody && comp instanceof ContainerComponent)
             {
                 Frame frame = new Frame((ContainerComponent) comp, tagLevel);
                 frameStack.add(currentFrame);
@@ -174,7 +173,8 @@ public class TagParser extends DefaultHandler
             return null;
         }
 
-        public void render(RenderOutput writer, Map<String, ?> attributes) {
+        public boolean render(RenderOutput writer, Map<String, ?> attributes) {
+            return true;
         }
     }
 }

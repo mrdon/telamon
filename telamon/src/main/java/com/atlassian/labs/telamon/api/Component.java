@@ -5,5 +5,5 @@ import java.util.Map;
 
 public interface Component
 {
-    void render(RenderOutput writer, Map<String, ?> attributes);
+    boolean render(RenderOutput writer, Map<String, ?> attributes);
 }

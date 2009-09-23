@@ -9,6 +9,7 @@
   <modules>
     <module>telamon</module>
     <module>standalone-web-example</module>
+    <module>../js2j</module>
   </modules>
   <dependencies>
     <dependency>

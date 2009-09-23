@@ -9,7 +9,7 @@ import java.util.Collections;
 import static com.atlassian.labs.telamon.util.FileUtils.file;
 import com.atlassian.labs.telamon.util.StringRenderOutput;
 import com.atlassian.labs.telamon.rhino.RhinoComponentFactory;
-import com.atlassian.labs.telamon.rhino.WriterRenderOutput;
+import com.atlassian.labs.telamon.util.WriterRenderOutput;
 import com.atlassian.labs.telamon.api.Component;
 import com.atlassian.labs.telamon.api.ContainerComponent;
 

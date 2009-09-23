@@ -18,8 +18,7 @@ import com.atlassian.labs.telamon.api.Component;
 import com.atlassian.labs.telamon.api.SingletonComponentFactory;
 import com.atlassian.labs.telamon.api.RenderOutput;
 import com.atlassian.labs.telamon.api.ContainerComponent;
-import com.atlassian.labs.telamon.rhino.RhinoComponentFactory;
-import com.atlassian.labs.telamon.rhino.WriterRenderOutput;
+import com.atlassian.labs.telamon.util.WriterRenderOutput;
 
 public abstract class AbstractDirective extends Directive
 {
@@ -58,19 +57,22 @@ public abstract class AbstractDirective extends Directive
         Component comp = componentFactory.create(name, id, Collections.<String,Object> emptyMap());
 
         RenderOutput output = new WriterRenderOutput(writer);
-        comp.render(output, args);
+        boolean shouldRenderBody = comp.render(output, args);
 
-        Writer bodyWriter = writer;
-        if (getType() == BLOCK) {
-            bodyWriter = new StringWriter();
-        }
-
-        Node body = node.jjtGetChild(node.jjtGetNumChildren() - 1);
-        body.render(internalContextAdapter, bodyWriter);
-
-        if (getType() == BLOCK)
+        if (shouldRenderBody)
         {
-            ((ContainerComponent)comp).renderEnd(output, bodyWriter.toString());
+            Writer bodyWriter = writer;
+            if (getType() == BLOCK) {
+                bodyWriter = new StringWriter();
+            }
+
+            Node body = node.jjtGetChild(node.jjtGetNumChildren() - 1);
+            body.render(internalContextAdapter, bodyWriter);
+
+            if (getType() == BLOCK)
+            {
+                ((ContainerComponent)comp).renderEnd(output, bodyWriter.toString());
+            }
         }
         return true;
     }

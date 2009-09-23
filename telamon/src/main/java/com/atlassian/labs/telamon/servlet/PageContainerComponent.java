@@ -41,6 +41,7 @@ public class PageContainerComponent implements ContainerComponent {
         return children.get(id);
     }
 
-    public void render(RenderOutput writer, Map<String, ?> attributes) {
+    public boolean render(RenderOutput writer, Map<String, ?> attributes) {
+        return true;
     }
 }

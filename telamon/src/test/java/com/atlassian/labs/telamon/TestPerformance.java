@@ -2,15 +2,13 @@ package com.atlassian.labs.telamon;
 
 import junit.framework.TestCase;
 import com.atlassian.labs.telamon.rhino.RhinoComponentFactory;
-import com.atlassian.labs.telamon.rhino.WriterRenderOutput;
+import com.atlassian.labs.telamon.util.WriterRenderOutput;
 import static com.atlassian.labs.telamon.util.FileUtils.file;
 import com.atlassian.labs.telamon.api.Component;
 import com.atlassian.labs.telamon.api.RenderOutput;
 import static com.atlassian.labs.telamon.Helper.buildComponentFactory;
 
 import java.util.Collections;
-import java.util.List;
-import java.util.ArrayList;
 import java.util.Map;
 import java.io.StringWriter;
 import java.io.IOException;
@@ -33,11 +31,12 @@ public class TestPerformance extends TestCase
         long start = System.currentTimeMillis();
 
         StringWriter writer = new StringWriter();
+        WriterRenderOutput output = new WriterRenderOutput(writer);
         for (int x=0; x<runs; x++)
         {
             Component comp = factory.create("TextField", "foo", Collections.singletonMap("value", "foobar"));
-            comp.render(new WriterRenderOutput(writer), Collections.singletonMap("label", "Some label"));
-            writer = new StringWriter();
+            comp.render(output, Collections.singletonMap("label", "Some label"));
+            writer.getBuffer().setLength(0);
         }
 
 
@@ -55,7 +54,7 @@ public class TestPerformance extends TestCase
         {
             Component comp = new TextFieldComponent("foo", Collections.<String, Object>singletonMap("value", "foobar"));
             comp.render(new WriterRenderOutput(writer), Collections.singletonMap("label", "Some label"));
-            writer = new StringWriter();
+            writer.getBuffer().setLength(0);
         }
 
         return System.currentTimeMillis() - start;
@@ -72,7 +71,7 @@ public class TestPerformance extends TestCase
             this.params = params;
         }
 
-        public void render(RenderOutput writer, Map<String, ?> attributes)
+        public boolean render(RenderOutput writer, Map<String, ?> attributes)
         {
             StringBuilder sb = new StringBuilder();
             String xml = "<div> \n'" +
@@ -81,6 +80,7 @@ public class TestPerformance extends TestCase
                         "         value=\"" + params.get("value") + "\"/> \n" +
                         "</div>";
             writer.write(xml);
+            return true;
         }
     }
 }

@@ -7,13 +7,14 @@ function Form(id, params) {
     this.render = function(writer, attrs) {
         var xml = '<form name="' + this.id + '" action="' + this.params.action + '" method="' + attrs.method + '"> \n';
         writer.write(xml);
+        return true;
     };
     this.renderEnd = function(writer, body) {
         var xml = '</form>';
         writer.write(body);
         writer.write(xml);
     };
-    this.childrenNames = ["kid"];
+    this.childNames = ["kid"];
     this.get = function(id) {
         return this.children[id]; 
     };

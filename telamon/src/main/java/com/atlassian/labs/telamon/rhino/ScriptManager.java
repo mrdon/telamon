@@ -1,22 +1,21 @@
 package com.atlassian.labs.telamon.rhino;
 
-import org.mozilla.javascript.*;
-import org.apache.commons.js2j.SugarWrapFactory;
-import org.apache.commons.js2j.SugarContextFactory;
-
-import java.util.*;
-import java.util.concurrent.ConcurrentHashMap;
-import java.io.InputStream;
-import java.io.IOException;
-import java.io.InputStreamReader;
-import java.io.Reader;
-import java.net.URL;
-
-import com.atlassian.labs.telamon.rhino.variable.JsGlobal;
-import com.atlassian.labs.telamon.api.TelamonException;
 import com.atlassian.labs.telamon.api.Component;
 import com.atlassian.labs.telamon.api.ContainerComponent;
 import com.atlassian.labs.telamon.api.RenderOutput;
+import com.atlassian.labs.telamon.api.TelamonException;
+import com.atlassian.labs.telamon.rhino.variable.JsGlobal;
+import com.atlassian.labs.telamon.util.IOUtils;
+import org.apache.commons.js2j.SugarContextFactory;
+import org.apache.commons.js2j.SugarWrapFactory;
+import org.mozilla.javascript.*;
+
+import java.io.IOException;
+import java.io.Reader;
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
 
 /**
  * Created by IntelliJ IDEA.
@@ -32,7 +31,7 @@ public class ScriptManager
 
     static
     {
-        SugarWrapFactory factory = new SugarWrapFactory();
+        SugarWrapFactory factory = new SugarWrapFactory(Collections.<Class>emptyList());
         ContextFactory.initGlobal(new SugarContextFactory(factory));
     }
 
@@ -60,9 +59,11 @@ public class ScriptManager
     public void runInSharedScope(ScriptSource scriptSource)
     {
         Context cx = Context.enter();
+        Reader reader = null;
         try
         {
-            cx.evaluateReader(sharedScope, scriptSource.getReader(), scriptSource.getPath(), 1, null);
+            reader = scriptSource.getReader();
+            cx.evaluateReader(sharedScope, reader, scriptSource.getPath(), 1, null);
         }
         catch (IOException e)
         {
@@ -71,6 +72,7 @@ public class ScriptManager
         finally
         {
             Context.exit();
+            IOUtils.closeQuietly(reader);
         }
     }
 
@@ -103,14 +105,17 @@ public class ScriptManager
         if (!scripts.containsKey(source.getPath()))
         {
             Context cx = Context.enter();
+            Reader reader = null;
             try
             {
-                Script script = cx.compileReader(source.getReader(), source.getPath(), 1, null);
+                reader = source.getReader();
+                Script script = cx.compileReader(reader, source.getPath(), 1, null);
                 scripts.put(source.getPath(), script);
             }
             finally
             {
                 Context.exit();
+                IOUtils.closeQuietly(reader);
             }
         }
     }
@@ -131,9 +136,7 @@ public class ScriptManager
             threadScope.setParentScope(null);
 
 
-            Object result = null;
             String path = scriptSource.getPath();
-            Reader reader = scriptSource.getReader();
             System.out.println("really running " + path);
             ensureCompiled(scriptSource);
             Script script = scripts.get(path);
@@ -146,7 +149,7 @@ public class ScriptManager
                 ScriptableObject.putProperty(threadScope, var.getKey(), wrapped);
             }
 
-            result = script.exec(cx, threadScope);
+            script.exec(cx, threadScope);
         }
         finally
         {
@@ -158,7 +161,7 @@ public class ScriptManager
     {
         if (result instanceof NativeObject)
         {
-            boolean isContainer = ((NativeObject)result).has("renderEnd", null);
+            boolean isContainer = ScriptableObject.hasProperty((NativeObject)result, "renderEnd");
             if (isContainer) {
                 return new JsContainerComponent((NativeObject) result, scope);
             } else
@@ -191,9 +194,10 @@ public class ScriptManager
             this.scope = scope;
         }
 
-        public void render(RenderOutput writer, Map<String, ?> attributes)
+        public boolean render(RenderOutput writer, Map<String, ?> attributes)
         {
-            exec("render", writer, attributes);
+            Boolean result = (Boolean) exec("render", writer, attributes);
+            return (result == null ? false : result);
         }
 
         protected Object exec(String funcName, Object... args)
@@ -201,13 +205,20 @@ public class ScriptManager
             Context cx = Context.enter();
             try
             {
-                Function func = (Function) jsObject.get(funcName, null);
+                Function func = (Function) ScriptableObject.getProperty(jsObject, funcName);
                 Object[] wrappedArgs = new Object[args.length];
                 for (int x=0; x<args.length; x++)
                 {
                     wrappedArgs[x] = Context.javaToJS(args[x], scope);
                 }
-                return func.call(cx, scope, jsObject, wrappedArgs);
+                Object result = func.call(cx, scope, jsObject, wrappedArgs);
+                if (result == Undefined.instance)
+                {
+                    return null;
+                } else
+                {
+                    return result;
+                }
             }
             finally
             {
@@ -234,7 +245,7 @@ public class ScriptManager
 
         public String[] getChildNames()
         {
-            Object result = jsObject.get("childrenNames", null);
+            Object result = ScriptableObject.getProperty(jsObject, "childrenNames");
             return (String[]) Context.jsToJava(result, String[].class);
         }
 
