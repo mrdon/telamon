@@ -1,8 +1,8 @@
-function Form(id, params) {
+TM.Form = function(id, params) {
     this.id = id;
     this.params = (params ? params : {});
     this.children = {
-        kid : new TextField("kid", {value : "child"})
+        kid : new TM.TextField("kid", {value : "child"})
     };
     this.render = function(writer, attrs) {
         var xml = '<form name="' + this.id + '" action="' + this.params.action + '" method="' + attrs.method + '"> \n';
@@ -14,7 +14,7 @@ function Form(id, params) {
         writer.write(body);
         writer.write(xml);
     };
-    this.childrenNames = function() { return ["kid"]};
+    this.childNames = function() { return ["kid"]};
     this.get = function(id) {
         return this.children[id]; 
     };

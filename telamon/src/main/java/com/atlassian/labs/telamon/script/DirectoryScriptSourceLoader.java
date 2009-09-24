@@ -43,7 +43,7 @@ public class DirectoryScriptSourceLoader implements ScriptSourceLoader {
         Collections.sort(sources, new Comparator<ScriptSource>()
         {
             public int compare(ScriptSource first, ScriptSource second) {
-                return first.getPath().compareTo(second.getPath());
+                return second.getPath().compareTo(first.getPath());
             }
         });
 

@@ -1,8 +1,8 @@
-function TextField(id, params) {
+TM.TextField = function(id, params) {
     this.id = id;
     this.params = (params ? params : {});
 }
-TextField.prototype.render = function(writer, attrs) {
+TM.TextField.prototype.render = function(writer, attrs) {
     var xml = '<div> \n' +
               '  <label for="' + this.id + '"/> \n' +
               '  <input type="text" id="' + this.id + '" name="' + this.id + '" title="' + attrs.label + '" \n' +

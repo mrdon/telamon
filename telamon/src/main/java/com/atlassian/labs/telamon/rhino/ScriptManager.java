@@ -1,10 +1,10 @@
 package com.atlassian.labs.telamon.rhino;
 
 import com.atlassian.labs.telamon.api.Component;
-import com.atlassian.labs.telamon.api.ContainerComponent;
-import com.atlassian.labs.telamon.api.RenderOutput;
 import com.atlassian.labs.telamon.api.TelamonException;
 import com.atlassian.labs.telamon.rhino.variable.JsGlobal;
+import com.atlassian.labs.telamon.rhino.variable.JsComponent;
+import com.atlassian.labs.telamon.rhino.variable.JsContainerComponent;
 import com.atlassian.labs.telamon.util.IOUtils;
 import com.atlassian.labs.telamon.script.ScriptSource;
 import org.apache.commons.js2j.SugarContextFactory;
@@ -84,8 +84,8 @@ public class ScriptManager
         {
             // Don't bother with a scope per thread since they should not be mutated
             Scriptable threadScope = sharedScope;
-
-            Function func = (Function) threadScope.get(functionName, null);
+            Scriptable tm = (Scriptable) ScriptableObject.getProperty(threadScope, "TM");
+            Function func = (Function) ScriptableObject.getProperty(tm, functionName);
             Object[] wrappedArgs = new Object[args.length];
             for (int x = 0; x < args.length; x++)
             {
@@ -184,77 +184,5 @@ public class ScriptManager
         return sharedScope;
     }
 
-    private static class JsComponent implements Component
-    {
-        private final NativeObject jsObject;
-        private final Scriptable scope;
-
-        public JsComponent(NativeObject jsObject, Scriptable scope)
-        {
-            this.jsObject = jsObject;
-            this.scope = scope;
-        }
-
-        public boolean render(RenderOutput writer, Map<String, ?> attributes)
-        {
-            Boolean result = (Boolean) exec("render", writer, attributes);
-            return (result == null ? false : result);
-        }
-
-        protected Object exec(String funcName, Object... args)
-        {
-            Context cx = Context.enter();
-            try
-            {
-                Function func = (Function) ScriptableObject.getProperty(jsObject, funcName);
-                Object[] wrappedArgs = new Object[args.length];
-                for (int x=0; x<args.length; x++)
-                {
-                    wrappedArgs[x] = Context.javaToJS(args[x], scope);
-                }
-                Object result = func.call(cx, scope, jsObject, wrappedArgs);
-                if (result == Undefined.instance)
-                {
-                    return null;
-                } else
-                {
-                    return result;
-                }
-            }
-            finally
-            {
-                Context.exit();
-            }
-        }
-    }
-
-    private static class JsContainerComponent extends JsComponent implements ContainerComponent
-    {
-        private final Scriptable scope;
-        private final NativeObject jsObject;
-        public JsContainerComponent(NativeObject jsObject, Scriptable scope)
-        {
-            super(jsObject, scope);
-            this.scope = scope;
-            this.jsObject = jsObject;
-        }
-
-        public void renderEnd(RenderOutput writer, String content)
-        {
-            exec("renderEnd", writer, content);
-        }
-
-        public String[] getChildNames()
-        {
-            Object result = exec("childrenNames");
-            return (String[]) Context.jsToJava(result, String[].class);
-        }
-
-        public Component get(String id)
-        {
-            Object result = exec("get", id);
-            return castResult(scope, result);
-        }
-    }
 }
 
