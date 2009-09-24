@@ -1,4 +1,5 @@
-TM.TextField = function (params) {
+TM.TextField = function (id, params) {
+    this.id = id;
     this.params = {
         type: "text"
     };
@@ -7,6 +8,6 @@ TM.TextField = function (params) {
 };
 TM.TextField.prototype.attr = TM._attr;
 TM.TextField.prototype.renderAttributes = TM._renderAttributes;
-TM.TextField.prototype.toString = TM.TextField.prototype.render = function (params) {
-    return "<input" + this.renderAttributes(params) + ">";
+TM.TextField.prototype.render = function (writer, params) {
+    writer.write("<input" + this.renderAttributes(params) + ">");
 };
