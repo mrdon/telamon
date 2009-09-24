@@ -2,11 +2,15 @@ package com.atlassian.labs.telamon.servlet;
 
 import com.atlassian.labs.telamon.api.SingletonComponentFactory;
 import com.atlassian.labs.telamon.rhino.RhinoComponentFactory;
+import com.atlassian.labs.telamon.script.DirectoryScriptSourceLoader;
+import com.atlassian.labs.telamon.script.ScriptSourceLoader;
 
 import javax.servlet.ServletContextListener;
 import javax.servlet.ServletContextEvent;
 import javax.servlet.ServletContext;
 import java.io.File;
+import java.util.List;
+import java.util.ArrayList;
 
 public class TelamonServletContextListener implements ServletContextListener
 {
@@ -14,8 +18,13 @@ public class TelamonServletContextListener implements ServletContextListener
     {
         ServletContext ctx = servletContextEvent.getServletContext();
 
-        File[] componentDirs = parseBaseDirs(ctx, "/include/components");
-        RhinoComponentFactory factory = new RhinoComponentFactory(componentDirs);
+        List<ScriptSourceLoader> loaders = new ArrayList<ScriptSourceLoader>();
+        for (File baseDir : parseBaseDirs(ctx, "/include/components"))
+        {
+            loaders.add(new DirectoryScriptSourceLoader(baseDir));
+        }
+
+        RhinoComponentFactory factory = new RhinoComponentFactory(loaders.toArray(new ScriptSourceLoader[loaders.size()]));
         SingletonComponentFactory.setInstance(factory);
     }
 

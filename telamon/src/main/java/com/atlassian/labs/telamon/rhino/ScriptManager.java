@@ -6,6 +6,7 @@ import com.atlassian.labs.telamon.api.RenderOutput;
 import com.atlassian.labs.telamon.api.TelamonException;
 import com.atlassian.labs.telamon.rhino.variable.JsGlobal;
 import com.atlassian.labs.telamon.util.IOUtils;
+import com.atlassian.labs.telamon.script.ScriptSource;
 import org.apache.commons.js2j.SugarContextFactory;
 import org.apache.commons.js2j.SugarWrapFactory;
 import org.mozilla.javascript.*;
@@ -245,7 +246,7 @@ public class ScriptManager
 
         public String[] getChildNames()
         {
-            Object result = ScriptableObject.getProperty(jsObject, "childrenNames");
+            Object result = exec("childrenNames");
             return (String[]) Context.jsToJava(result, String[].class);
         }
 

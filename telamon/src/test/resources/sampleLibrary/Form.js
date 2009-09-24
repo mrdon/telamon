@@ -14,7 +14,7 @@ function Form(id, params) {
         writer.write(body);
         writer.write(xml);
     };
-    this.childNames = ["kid"];
+    this.childrenNames = function() { return ["kid"]};
     this.get = function(id) {
         return this.children[id]; 
     };

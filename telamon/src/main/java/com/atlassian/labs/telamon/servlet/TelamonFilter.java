@@ -2,6 +2,7 @@ package com.atlassian.labs.telamon.servlet;
 
 import com.atlassian.labs.telamon.rhino.RhinoComponentFactory;
 import com.atlassian.labs.telamon.rhino.ScriptManager;
+import com.atlassian.labs.telamon.script.DirectoryScriptSourceLoader;
 import com.atlassian.labs.telamon.util.RequestUtils;
 
 import javax.servlet.*;
@@ -23,7 +24,7 @@ public class TelamonFilter implements Filter {
 
         File baseDir = new File(filterConfig.getServletContext().getRealPath("/WEB-INF/components"));
         scriptManager = new ScriptManager();
-        componentFactory = new RhinoComponentFactory(scriptManager, baseDir);
+        componentFactory = new RhinoComponentFactory(scriptManager, new DirectoryScriptSourceLoader(baseDir));
         this.servletContext = filterConfig.getServletContext();
     }
 

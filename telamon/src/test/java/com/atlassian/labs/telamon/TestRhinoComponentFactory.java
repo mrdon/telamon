@@ -5,6 +5,7 @@ import junit.framework.TestCase;
 import java.io.IOException;
 import java.io.StringWriter;
 import java.util.Collections;
+import java.net.URISyntaxException;
 
 import static com.atlassian.labs.telamon.util.FileUtils.file;
 import com.atlassian.labs.telamon.util.StringRenderOutput;
@@ -12,12 +13,12 @@ import com.atlassian.labs.telamon.rhino.RhinoComponentFactory;
 import com.atlassian.labs.telamon.util.WriterRenderOutput;
 import com.atlassian.labs.telamon.api.Component;
 import com.atlassian.labs.telamon.api.ContainerComponent;
+import static com.atlassian.labs.telamon.Helper.buildComponentFactory;
 
 public class TestRhinoComponentFactory extends TestCase
 {
-    public void testSimpleComponent() throws IOException
-    {
-        RhinoComponentFactory factory = new RhinoComponentFactory(file("src", "test", "resources", "sampleLibrary"));
+    public void testSimpleComponent() throws IOException, URISyntaxException {
+        RhinoComponentFactory factory = buildComponentFactory();
         Component comp = factory.create("TextField", "foo", Collections.singletonMap("value", "foobar"));
 
         StringWriter writer = new StringWriter();
@@ -28,9 +29,8 @@ public class TestRhinoComponentFactory extends TestCase
         assertTrue(writer.toString().contains("title=\"Some label\""));
     }
 
-    public void testSimpleContainerComponent() throws IOException
-    {
-        RhinoComponentFactory factory = new RhinoComponentFactory(file("src", "test", "resources", "sampleLibrary"));
+    public void testSimpleContainerComponent() throws IOException, URISyntaxException {
+        RhinoComponentFactory factory = buildComponentFactory();
         ContainerComponent comp = (ContainerComponent) factory.create("Form", "foo", Collections.singletonMap("action", "foo.bar"));
 
         StringRenderOutput rootOutput = new StringRenderOutput();

@@ -1,8 +1,8 @@
 package com.atlassian.labs.telamon;
 
-import com.atlassian.labs.telamon.api.ComponentFactory;
 import com.atlassian.labs.telamon.api.SingletonComponentFactory;
 import com.atlassian.labs.telamon.rhino.RhinoComponentFactory;
+import com.atlassian.labs.telamon.script.DirectoryScriptSourceLoader;
 import static com.atlassian.labs.telamon.util.FileUtils.file;
 
 import java.net.URL;
@@ -16,7 +16,7 @@ public class Helper
     {
         URL url = Helper.class.getResource("/sampleLibrary/");
         File dir = new File(url.toURI());
-        RhinoComponentFactory factory = new RhinoComponentFactory(dir);
+        RhinoComponentFactory factory = new RhinoComponentFactory(new DirectoryScriptSourceLoader(dir));
         SingletonComponentFactory.setInstance(factory);
         return factory;
     }

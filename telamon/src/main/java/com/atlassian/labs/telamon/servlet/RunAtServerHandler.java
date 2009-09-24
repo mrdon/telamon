@@ -4,7 +4,7 @@ import org.xml.sax.helpers.DefaultHandler;
 import org.xml.sax.*;
 import com.atlassian.labs.telamon.rhino.ScriptManager;
 import com.atlassian.labs.telamon.util.UrlScriptSource;
-import com.atlassian.labs.telamon.rhino.ScriptSource;
+import com.atlassian.labs.telamon.script.ScriptSource;
 import com.atlassian.labs.telamon.api.ContainerComponent;
 
 import javax.servlet.ServletContext;

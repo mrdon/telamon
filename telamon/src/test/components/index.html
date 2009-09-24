@@ -1,0 +1,65 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01//EN" "http://www.w3.org/TR/hTMl4/strict.dtd">
+<hTMl>
+<head>
+    <meta http-equiv="Content-Type" content="text/hTMl; charset=utf-8">
+    <title>Telamon testing</title>
+</head>
+<body>
+    <h1 id="boo">Boo!</h1>
+    
+    <script type="text/javascript" src="jquery-1.3.2.js"></script>
+    <script type="text/javascript" src="../../main/components/_setup.js"></script>
+    <script type="text/javascript" src="../../main/components/TextField.js"></script>
+    <script type="text/javascript" src="../../main/components/TextArea.js"></script>
+    <script type="text/javascript" src="../../main/components/Label.js"></script>
+    
+    <script type="text/javascript">
+    
+        var label = new TM.Label("firstID", {
+            text: "This is label text",
+            "class": "myNewClass"
+        });
+        
+        label.add(new TM.Label("secondID", "another label!"));
+        
+        $("#boo").append(TM.render(label));
+        
+        // 
+        // var textAUI = TM.textSet({
+        //     label: {
+        //         text: "First Name"
+        //     },
+        //     description: {               
+        //         text: "Default width input."
+        //     },
+        //     error: {
+        //         text: "something bad happened."
+        //     }
+        // });
+        // 
+        // var textAUI = TM.textSet({
+        //     label: "First Name",
+        //     description: "Default width input.",
+        //     error: {
+        //         id: "asdda",
+        //         text: "some text"
+        //     }
+        // });
+        // 
+        // 
+        // var textAUI = new TM.textSet("foo");
+        // textAUI.get("description").text = "This is a field";
+        // 
+        // 
+    </script>
+    
+    <!-- <div>
+           <label for="fname" accesskey="e">First Name<span class="form-icon icon-required"><span>required</span></span></label>
+           <input class="text" type="text" id="fname" name="fname" title="first name">
+           <span class="error">something bad happened.</span>
+           <span class="description">Default width input.</span>
+       </div> -->
+	
+	
+</body>
+</hTMl>
