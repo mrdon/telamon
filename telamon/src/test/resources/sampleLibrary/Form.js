@@ -14,8 +14,8 @@ TM.Form = function(id, params) {
         writer.write(body);
         writer.write(xml);
     };
-    this.childNames = function() { return ["kid"]};
+    this.childNames = function() { return ["kid"];};
     this.get = function(id) {
         return this.children[id]; 
     };
-}
+};
